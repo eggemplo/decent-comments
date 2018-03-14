@@ -1,5 +1,9 @@
 Decent Comments by itthinx                                           Changelog
 
+= 1.6.1 =
+* Tested with Wordpress 4.9.4
+* Added the '' filter for truncate the comment title.
+
 = 1.6.0 =
 * Tested with WordPress 4.9.1.
 * Added the Russian translation.

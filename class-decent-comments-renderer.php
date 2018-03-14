@@ -40,11 +40,12 @@ class Decent_Comments_Renderer {
 	 */
 	static $defaults = array(
 		//
-		"ellipsis"          => "...",
-		"excerpt"           => true,
-		"max_excerpt_words" => 20,
+		"ellipsis"               => "...",
+		"excerpt"                => true,
+		"max_excerpt_words"      => 20,
 		"max_excerpt_characters" => 0,
-		"strip_tags"        => true,
+		"max_title_characters"   => 0,
+		"strip_tags"             => true,
 
 		//
 		"avatar_size"  => 24,
@@ -342,6 +343,9 @@ class Decent_Comments_Renderer {
 			if ( isset( $options['max_excerpt_characters'] ) ) {
 				$max_excerpt_characters = intval( $options['max_excerpt_characters'] );
 			}
+			if ( isset( $options['max_title_characters'] ) ) {
+				$max_title_characters = intval( $options['max_title_characters'] );
+			}
 			if ( isset( $options['ellipsis'] ) ) {
 				$ellipsis = $options['ellipsis'];
 			}
@@ -410,10 +414,28 @@ class Decent_Comments_Renderer {
 				}
 
 				if ( $show_link ) {
+					// character limit
+					$title_output = get_the_title( $comment->comment_post_ID );
+					if ( $max_title_characters > 0 ) {
+						if ( function_exists( 'mb_substr' ) ) {
+							$charset = get_bloginfo( 'charset' );
+							$length = mb_strlen( $title_output, $charset );
+							$title_output = mb_substr( $title_output, 0, $max_title_characters, $charset );
+							if ( mb_strlen( $title_output ) < $length ) {
+								$title_output .= $ellipsis;
+							}
+						} else {
+							$length = strlen( $title_output );
+							$title_output = substr( $title_output, 0, $max_title_characters );
+							if ( strlen( $title_output ) < $length ) {
+								$title_output .= $ellipsis;
+							}
+						}
+					}
 					$output .= '<span class="comment-link">';
 					$output .= sprintf(
 						_x( ' on %s', 'comment-link', DC_PLUGIN_DOMAIN ),
-						'<a href="' . esc_url( get_comment_link( $comment->comment_ID ) ) . '">' . get_the_title( $comment->comment_post_ID ) . '</a>'
+						'<a href="' . esc_url( get_comment_link( $comment->comment_ID ) ) . '">' . $title_output . '</a>'
 					);
 					$output .= '</span>'; // .comment-link
 				}
